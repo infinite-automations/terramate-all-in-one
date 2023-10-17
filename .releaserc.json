@@ -1,0 +1,51 @@
+{
+    "branches": [
+        "main"
+    ],
+    "tagFormat": "v${version}",
+    "plugins": [
+        "@semantic-release/commit-analyzer",
+        "semantic-release-major-tag",
+        "@semantic-release/release-notes-generator",
+        [
+            "@semantic-release/changelog",
+            {
+                "changelogFile": "CHANGELOG.md"
+            }
+        ],
+        [
+            "semantic-release-replace-plugin",
+            {
+                "replacements": [
+                    {
+                        "files": [
+                            "README.md"
+                        ],
+                        "from": "\"m4s-b3n/terramate-all-in-one@v.*\"",
+                        "to": "\"m4s-b3n/terramate-all-in-one@v${nextRelease.version}\"",
+                        "results": [
+                            {
+                                "file": "README.md",
+                                "hasChanged": true,
+                                "numMatches": 2,
+                                "numReplacements": 2
+                            }
+                        ],
+                        "countMatches": true
+                    }
+                ]
+            }
+        ],
+        [
+            "@semantic-release/git",
+            {
+                "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}",
+                "assets": [
+                    "CHANGELOG.md",
+                    "README.md"
+                ]
+            }
+        ],
+        "@semantic-release/github"
+    ]
+}
