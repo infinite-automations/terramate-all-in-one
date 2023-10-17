@@ -1,0 +1,137 @@
+name: "Test & Release"
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: write
+
+jobs:
+  test-setup:
+    name: Test Setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        terramate-version: ["0.4.0", "latest"]
+        terraform-version: ["1.5.7", "latest"]
+        plan-file: ["out.tfplan", "plan.out"]
+        tmp-file: ["tmp.txt", "file.tmp"]
+        comment-pull-request: ["true", "false"]
+        cleanup: ["true", "false"]
+      fail-fast: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Test
+        uses: "./"
+        with:
+          terraform-version: ${{ matrix.terraform-version }}
+          plan-file: ${{ matrix.plan-file }}
+          directory: "test/terraform"
+
+  test-args:
+    name: Test Arguments
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        terramate-args: ["--changed", ""]
+        terraform-common-args: ["-no-color", ""]
+        terraform-init-args: ["-upgrade", ""]
+        terraform-validate-args: ["-json", ""]
+        terraform-plan-args: ["-parallelism=3", ""]
+        terraform-apply-args: ["-parallelism=2", ""]
+        terraform-destroy-args: ["-compact-warnings", ""]
+      fail-fast: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Test
+        uses: "./"
+        with:
+          terramate-args: ${{ matrix.terramate-args }}
+          terraform-common-args: ${{ matrix.terraform-common-args }}
+          terraform-init-args: ${{ matrix.terraform-init-args }}
+          terraform-validate-args: ${{ matrix.terraform-validate-args }}
+          terraform-plan-args: ${{ matrix.terraform-plan-args }}
+          terraform-apply-args: ${{ matrix.terraform-apply-args }}
+          terraform-destroy-args: ${{ matrix.terraform-destroy-args }}
+          apply: true
+          destroy: true
+
+  test-jobs:
+    name: Test Jobs
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lint: ["true", "false"]
+        generate: ["true", "false"]
+        validate: ["true", "false"]
+        plan: ["true", "false"]
+        apply: ["true", "false"]
+        destroy: ["true", "false"]
+      fail-fast: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Test With Setup And Init
+        uses: "./"
+        with:
+          lint: ${{ matrix.lint }}
+          validate: ${{ matrix.validate }}
+          plan: ${{ matrix.plan }}
+          apply: ${{ matrix.apply }}
+          destroy: ${{ matrix.destroy }}
+      - name: Test With Init Only
+        uses: "./"
+        with:
+          setup: false
+          init: true
+          lint: ${{ matrix.lint }}
+          validate: ${{ matrix.validate }}
+          plan: ${{ matrix.plan }}
+          apply: ${{ matrix.apply }}
+          destroy: ${{ matrix.destroy }}
+      - name: Test Without Setup And Init
+        uses: "./"
+        with:
+          setup: false
+          init: false
+          lint: ${{ matrix.lint }}
+          validate: ${{ matrix.validate }}
+          plan: ${{ matrix.plan }}
+          apply: ${{ matrix.apply }}
+          destroy: ${{ matrix.destroy }}
+
+  release:
+    name: Release
+    needs:
+      - test-setup
+      - test-args
+      - test-jobs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Semantic Release Plugins
+        run: |
+          npm install semantic-release-replace-plugin -D
+          npm install --save-dev semantic-release-major-tag
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          dry_run: ${{ github.event_name == 'pull_request' }}
+          ci: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
