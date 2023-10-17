@@ -1,3 +1,10 @@
+# ci
+out.tfplan
+pr-comment.txt
+_terramate_generated_*
+.terraform.lock.hcl
+.tools-version
+
 # Local .terraform directories
 **/.terraform/*
 

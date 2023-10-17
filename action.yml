@@ -1,0 +1,241 @@
+name: "Terramate All-In-One"
+
+description: "Run common terramate commands in a single GitHub action"
+
+inputs:
+  go-version:
+    description: "The version of Go to use"
+    required: false
+    default: "latest"
+  terramate-version:
+    description: "The version of Terramate to use"
+    required: false
+    default: "latest"
+  terraform-version:
+    description: "The version of Terraform to use"
+    required: false
+    default: "latest"
+  terramate-args:
+    description: "Arguments to pass to Terramate"
+    required: false
+    default: "--changed"
+  terraform-common-args:
+    description: "Arguments to pass to Terraform"
+    required: false
+    default: ""
+  terraform-init-args:
+    description: "Arguments to pass to Terraform init"
+    required: false
+    default: ""
+  terraform-validate-args:
+    description: "Arguments to pass to Terraform validate"
+    required: false
+    default: ""
+  terraform-plan-args:
+    description: "Arguments to pass to Terraform plan"
+    required: false
+    default: ""
+  terraform-apply-args:
+    description: "Arguments to pass to Terraform apply"
+    required: false
+    default: ""
+  terraform-destroy-args:
+    description: "Arguments to pass to Terraform destroy"
+    required: false
+    default: ""
+  terraform-plan-file:
+    description: "Path to Terraform plan file"
+    required: false
+    default: "out.tfplan"
+  temp-file:
+    description: "Path to preview comment file"
+    required: false
+    default: "tmp.txt"
+  setup:
+    description: "Setup Terramate and Terraform"
+    required: false
+    default: "true"
+  init:
+    description: "Initialize Terraform"
+    required: false
+    default: "true"
+  lint:
+    description: "Run linting"
+    required: false
+    default: "true"
+  generate:
+    description: "Generate code"
+    required: false
+    default: "true"
+  validate:
+    description: "Validate Terraform"
+    required: false
+    default: "true"
+  plan:
+    description: "Plan Terraform"
+    required: false
+    default: "true"
+  apply:
+    description: "Apply Terraform"
+    required: false
+    default: "false"
+  destroy:
+    description: "Destroy Terraform"
+    required: false
+    default: "false"
+  comment-pull-request:
+    description: "Comment on pull requests"
+    required: false
+    default: "true"
+  github-token:
+    description: "GitHub oken required for commenting on pull requests"
+    required: false
+    default: ""
+  cleanup:
+    description: "Cleanup temporary files"
+    required: false
+    default: "true"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Go
+      if: ${{ inputs.setup == 'true' }}
+      uses: actions/setup-go@v4
+      with:
+        cache: false
+    - name: Setup Terramate
+      if: ${{ inputs.setup == 'true' }}
+      run: |
+        go install github.com/terramate-io/terramate/cmd/...@${{ inputs.terramate-version }}
+      shell: bash
+    - name: Setup Terraform
+      if: ${{ inputs.setup == 'true' }}
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: ${{ inputs.terraform-version }}
+    - name: Lint
+      if: ${{ inputs.lint == 'true' }}
+      run: |
+        terramate fmt --check
+      shell: bash
+    - name: List Affected Stacks
+      id: list
+      run: |
+        echo "stdout<<STDOUT" >>$GITHUB_OUTPUT
+        terramate list ${{ inputs.terramate-args }} >>$GITHUB_OUTPUT
+        EXIT_CODE=$?
+        echo "STDOUT" >>$GITHUB_OUTPUT
+        exit ${EXIT_CODE}
+      shell: bash
+    - name: Generate Code
+      if: ${{ inputs.generate == 'true' && steps.list.outputs.stdout != '' }}
+      run: |
+        terramate generate ${{ inputs.terramate-args }}
+      shell: bash
+    - name: Initialize
+      if: ${{ inputs.init == 'true' && steps.list.outputs.stdout != '' }}
+      run: |
+        terramate run ${{ inputs.terramate-args }} \
+          -- terraform init \
+            ${{ inputs.terraform-common-args }} \
+            ${{ inputs.terraform-init-args }}
+      shell: bash
+    - name: Validate
+      if: ${{ inputs.validate == 'true' && steps.list.outputs.stdout != '' }}
+      run: |
+        terramate run ${{ inputs.terramate-args }} \
+          -- terraform validate \
+            ${{ inputs.terraform-common-args }} \
+            ${{ inputs.terraform-validate-args }}
+      shell: bash
+    - name: Plan
+      if: >-
+        ${{ 
+          ( inputs.plan == 'true' ||
+            inputs.comment-pull-request == 'true'
+          ) && 
+          steps.list.outputs.stdout != '' }}
+      run: |
+        terramate run ${{ inputs.terramate-args }} \
+          -- terraform plan \
+            ${{ inputs.terraform-common-args }} \
+            ${{ inputs.terraform-plan-args }} \
+            -out ${{ inputs.terraform-plan-file }}
+      shell: bash
+    - name: Generate Preview Comment
+      if: >-
+        ${{ 
+          inputs.comment-pull-request == 'true' && 
+          github.event_name == 'pull_request'
+        }}
+      run: |
+        if [[ -z ${{ steps.list.outputs.stdout }} ]]; then
+          echo >>${{ inputs.preview-comment-file }} '### No changed stacks.'
+          cat ${{ inputs.preview-comment-file }} >>$GITHUB_STEP_SUMMARY
+        else
+          echo >>${{ inputs.preview-comment-file }} "### List of Changed Stacks"
+          echo >>${{ inputs.preview-comment-file }}
+          echo >>${{ inputs.preview-comment-file }} '```bash'
+          echo >>${{ inputs.preview-comment-file }} "${{ steps.list.outputs.stdout }}"
+          echo >>${{ inputs.preview-comment-file }} '```'
+          echo >>${{ inputs.preview-comment-file }}
+          echo >>${{ inputs.preview-comment-file }} "#### Terraform Plan"
+          echo >>${{ inputs.preview-comment-file }}
+          echo >>${{ inputs.preview-comment-file }} '```terraform'
+          terramate run --changed -- terraform show -no-color ${{ inputs.terraform-plan-file }} 2>&1 | dd bs=1024 count=248 >>${{ inputs.preview-comment-file }}
+          echo >>${{ inputs.preview-comment-file }} '```'
+          cat ${{ inputs.preview-comment-file }} >>$GITHUB_STEP_SUMMARY
+        fi
+      shell: bash
+    - name: Publish Plans
+      if: >-
+        ${{ 
+          inputs.comment-pull-request == 'true' && 
+          github.event_name == 'pull_request'
+        }}
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        header: terraform-plan
+        path: ${{ inputs.preview-comment-file }}
+    - name: Apply
+      if: >-
+        ${{ 
+          inputs.apply == 'true' && 
+          steps.list.outputs.stdout != ''
+        }}
+      run: |
+        if [ -f "${{ inputs.terraform-plan-file }}" ]; then
+          terramate run ${{ inputs.terramate-args }} \
+            -- terraform apply \
+              -auto-approve \
+              -input=false \
+              ${{ inputs.terraform-common-args }} \
+              ${{ inputs.terraform-apply-args }} \
+              ${{ inputs.terraform-plan-file }}
+        else
+          terramate run ${{ inputs.terramate-args }} \
+            -- terraform apply \
+              -auto-approve \
+              -input=false \
+              ${{ inputs.terraform-common-args }} \
+              ${{ inputs.terraform-apply-args }}
+        fi
+      shell: bash
+    - name: Destroy
+      if: ${{ inputs.destroy == 'true' && steps.list.outputs.stdout != '' }}
+      run: |
+        terramate run ${{ inputs.terramate-args }} \
+          -- terraform destroy \
+            -auto-approve \
+            -input=false \
+            ${{ inputs.terraform-common-args }} \
+            ${{ inputs.terraform-destroy-args }}
+      shell: bash
+    - name: Cleanup
+      if: ${{ inputs.cleanup == 'true' }}
+      run: |
+        find . -name out.tfplan -exec rm -rf {} \;
+        rm -f ${{ inputs.preview-comment-file }}
+      shell: bash
