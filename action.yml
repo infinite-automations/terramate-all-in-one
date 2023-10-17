@@ -97,7 +97,7 @@ runs:
   steps:
     - name: Setup Terramate and Terraform using asfd
       if: ${{ inputs.setup == 'true' }}
-      uses: asdf-vm/actions/install@v2.2.0
+      uses: asdf-vm/actions/install@v3.0.2
       with:
         tool_versions: |
           terramate ${{ inputs.terramate-version }}
