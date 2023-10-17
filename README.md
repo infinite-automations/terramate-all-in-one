@@ -32,7 +32,7 @@ jobs:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
       - name: Terramate
-        uses: m4s-b3n/terramate-all-in-one@v0.0.0
+        uses: m4s-b3n/terramate-all-in-one@v1.0.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -47,7 +47,7 @@ jobs:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
       - name: Terramate
-        uses: m4s-b3n/terramate-all-in-one@v0.0.0
+        uses: m4s-b3n/terramate-all-in-one@v1.0.0
         with:
           apply: true
 ```
