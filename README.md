@@ -16,8 +16,36 @@ on:
     branches: ["main"]
 
 permissions:
-  id-token: write
-  contents: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  terramate:
+    name: Terramate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Terramate
+        uses: m4s-b3n/terramate-all-in-one@v1.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          apply: ${{ github.event_name != 'pull_request' }}
+```
+
+If you want to explicitly separate plan and apply the workflow might look like the following:
+
+```yaml
+name: Terramate Flow
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
   pull-requests: write
 
 jobs:
@@ -28,9 +56,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-          fetch-depth: 0
       - name: Terramate
         uses: m4s-b3n/terramate-all-in-one@v1.0.0
         with:
@@ -43,9 +68,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-          fetch-depth: 0
       - name: Terramate
         uses: m4s-b3n/terramate-all-in-one@v1.0.0
         with:
