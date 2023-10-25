@@ -170,22 +170,22 @@ runs:
           github.event_name == 'pull_request'
         }}
       run: |
-        if [[ -z ${{ steps.list.outputs.stdout }} ]]; then
-          echo >>${{ inputs.preview-comment-file }} '### No changed stacks.'
-          cat ${{ inputs.preview-comment-file }} >>$GITHUB_STEP_SUMMARY
+        if [[ -z '${{ steps.list.outputs.stdout }}' ]]; then
+          echo >>${{ inputs.temp-file }} '### No changed stacks.'
+          cat ${{ inputs.temp-file }} >>$GITHUB_STEP_SUMMARY
         else
-          echo >>${{ inputs.preview-comment-file }} "### List of Changed Stacks"
-          echo >>${{ inputs.preview-comment-file }}
-          echo >>${{ inputs.preview-comment-file }} '```bash'
-          echo >>${{ inputs.preview-comment-file }} "${{ steps.list.outputs.stdout }}"
-          echo >>${{ inputs.preview-comment-file }} '```'
-          echo >>${{ inputs.preview-comment-file }}
-          echo >>${{ inputs.preview-comment-file }} "#### Terraform Plan"
-          echo >>${{ inputs.preview-comment-file }}
-          echo >>${{ inputs.preview-comment-file }} '```terraform'
-          terramate run --changed -- terraform show -no-color ${{ inputs.terraform-plan-file }} 2>&1 | dd bs=1024 count=248 >>${{ inputs.preview-comment-file }}
-          echo >>${{ inputs.preview-comment-file }} '```'
-          cat ${{ inputs.preview-comment-file }} >>$GITHUB_STEP_SUMMARY
+          echo >>${{ inputs.temp-file }} "### List of Changed Stacks"
+          echo >>${{ inputs.temp-file }}
+          echo >>${{ inputs.temp-file }} '```bash'
+          echo >>${{ inputs.temp-file }} "${{ steps.list.outputs.stdout }}"
+          echo >>${{ inputs.temp-file }} '```'
+          echo >>${{ inputs.temp-file }}
+          echo >>${{ inputs.temp-file }} "#### Terraform Plan"
+          echo >>${{ inputs.temp-file }}
+          echo >>${{ inputs.temp-file }} '```terraform'
+          terramate run --changed -- terraform show -no-color ${{ inputs.terraform-plan-file }} 2>&1 | dd bs=1024 count=248 >>${{ inputs.temp-file }}
+          echo >>${{ inputs.temp-file }} '```'
+          cat ${{ inputs.temp-file }} >>$GITHUB_STEP_SUMMARY
         fi
       shell: bash
     - name: Publish Plans
@@ -198,7 +198,7 @@ runs:
       with:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         header: terraform-plan
-        path: ${{ inputs.preview-comment-file }}
+        path: ${{ inputs.temp-file }}
     - name: Apply
       if: >-
         ${{ 
@@ -237,5 +237,5 @@ runs:
       if: ${{ inputs.cleanup == 'true' }}
       run: |
         find . -name out.tfplan -exec rm -rf {} \;
-        rm -f ${{ inputs.preview-comment-file }}
+        rm -f ${{ inputs.temp-file }}
       shell: bash
