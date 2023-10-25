@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/m4s-b3n/terramate-all-in-one/compare/v1.0.0...v1.0.1) (2023-10-25)
+
+
+### Bug Fixes
+
+* **PR:** fix preview step for multiple stacks ([a79a847](https://github.com/m4s-b3n/terramate-all-in-one/commit/a79a84713b446a29183e396e1939da25146f0f91))
+
 # 1.0.0 (2023-10-17)
 
 
