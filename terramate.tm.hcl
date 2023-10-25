@@ -3,9 +3,11 @@ terramate {
 
   config {
     git {
-      check_untracked   = false
-      check_uncommitted = false
-      check_remote      = false
+      default_branch    = "main"
+      default_remote    = "origin"
+      check_untracked   = true
+      check_uncommitted = true
+      check_remote      = true
     }
   }
 }

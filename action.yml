@@ -117,6 +117,7 @@ runs:
       if: ${{ inputs.setup == 'true' }}
       uses: hashicorp/setup-terraform@v2
       with:
+        terraform_wrapper: false
         terraform_version: ${{ inputs.terraform-version }}
     - name: Lint
       if: ${{ inputs.lint == 'true' }}
@@ -174,6 +175,7 @@ runs:
           github.event_name == 'pull_request'
         }}
       run: |
+        set +x
         if [[ -z '${{ steps.list.outputs.stdout }}' ]]; then
           echo >>${{ inputs.temp-file }} '### No changed stacks.'
           cat ${{ inputs.temp-file }} >>$GITHUB_STEP_SUMMARY
@@ -191,7 +193,9 @@ runs:
             -- terraform show \
             ${{ inputs.terraform-common-args }} \
             ${{ inputs.terraform-show-args }} \
-            ${{ inputs.terraform-plan-file }} 2>/dev/null >>${{ inputs.temp-file }}
+            ${{ inputs.terraform-plan-file }} \
+            2>&1 \
+            >>${{ inputs.temp-file }}
           echo >>${{ inputs.temp-file }} '```'
           cat ${{ inputs.temp-file }} >>$GITHUB_STEP_SUMMARY
         fi
