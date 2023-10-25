@@ -74,6 +74,8 @@ jobs:
           apply: true
 ```
 
+>Note: If you use terramate with a [git config](https://terramate.io/docs/cli/configuration/#terramate-config-git-block-schema) tracking uncommited files add the `terraform-plan-file` and `temp-file` to yout `.gitignore` file to prevent ci errors. See the [default filenames](#inputs) if you do not specify different within your workflow.
+
 ## Inputs
 
 | Input | Description | Required | Default |
@@ -86,6 +88,7 @@ jobs:
 | terraform-init-args | Arguments to pass to Terraform init | false |  |
 | terraform-validate-args | Arguments to pass to Terraform validate | false |  |
 | terraform-plan-args | Arguments to pass to Terraform plan | false |  |
+| terraform-show-args | Arguments to pass to Terraform show | false | -no-color |
 | terraform-apply-args | Arguments to pass to Terraform apply | false |  |
 | terraform-destroy-args | Arguments to pass to Terraform destroy | false |  |
 | terraform-plan-file | Path to Terraform plan file | false | out.tfplan |
