@@ -16,31 +16,35 @@ inputs:
     required: false
     default: "latest"
   terramate-args:
-    description: "Arguments to pass to Terramate"
+    description: "Arguments to pass to each Terramate command"
     required: false
     default: "--changed"
   terraform-common-args:
-    description: "Arguments to pass to Terraform"
+    description: "Arguments to pass to each Terraform command"
     required: false
     default: ""
   terraform-init-args:
-    description: "Arguments to pass to Terraform init"
+    description: "Arguments to pass to terraform init"
     required: false
     default: ""
   terraform-validate-args:
-    description: "Arguments to pass to Terraform validate"
+    description: "Arguments to pass to terraform validate"
     required: false
     default: ""
   terraform-plan-args:
-    description: "Arguments to pass to Terraform plan"
+    description: "Arguments to pass to terraform plan"
     required: false
     default: ""
+  terraform-show-args:
+    description: "Arguments to pass to terraform show"
+    required: false
+    default: "-no-color"
   terraform-apply-args:
-    description: "Arguments to pass to Terraform apply"
+    description: "Arguments to pass to terraform apply"
     required: false
     default: ""
   terraform-destroy-args:
-    description: "Arguments to pass to Terraform destroy"
+    description: "Arguments to pass to terraform destroy"
     required: false
     default: ""
   terraform-plan-file:
@@ -183,7 +187,11 @@ runs:
           echo >>${{ inputs.temp-file }} "#### Terraform Plan"
           echo >>${{ inputs.temp-file }}
           echo >>${{ inputs.temp-file }} '```terraform'
-          terramate run --changed -- terraform show -no-color ${{ inputs.terraform-plan-file }} 2>&1 | dd bs=1024 count=248 >>${{ inputs.temp-file }}
+          terramate run ${{ inputs.terramate-args }} \
+            -- terraform show \
+            ${{ inputs.terraform-common-args }} \
+            ${{ inputs.terraform-show-args }} \
+            ${{ inputs.terraform-plan-file }} 2>/dev/null >>${{ inputs.temp-file }}
           echo >>${{ inputs.temp-file }} '```'
           cat ${{ inputs.temp-file }} >>$GITHUB_STEP_SUMMARY
         fi
