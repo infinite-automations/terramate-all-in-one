@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/m4s-b3n/terramate-all-in-one/compare/v1.0.1...v1.0.2) (2023-10-25)
+
+
+### Bug Fixes
+
+* **PR:** fix plan show in preview step and add terraform-show-args ([27ac7d5](https://github.com/m4s-b3n/terramate-all-in-one/commit/27ac7d5292a3c01360fbeaa7f998c920c7d54e09))
+
 ## [1.0.1](https://github.com/m4s-b3n/terramate-all-in-one/compare/v1.0.0...v1.0.1) (2023-10-25)
 
 
