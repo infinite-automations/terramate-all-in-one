@@ -26,43 +26,16 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-  test-setup:
-    name: Test Setup
+  test-pull-request:
+    name: Test Pull Request
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        terramate-version: ["0.4.2", "latest"]
-        terraform-version: ["1.5.7", "latest"]
-        terraform-plan-file: ["out.tfplan", "plan.out"]
-        tmp-file: ["tmp.txt", "file.tmp"]
-        comment-pull-request: ["true", "false"]
-        cleanup: ["true", "false"]
-      fail-fast: true
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-          fetch-depth: 0
-      - name: Test
-        uses: "./"
-        with:
-          terraform-version: ${{ matrix.terraform-version }}
-          terraform-plan-file: ${{ matrix.terraform-plan-file }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-  test-args:
-    name: Test Arguments
-    runs-on: ubuntu-latest
+    needs:
+      - test-simple
+    if: ${{ github.event_name == 'pull_request' }}
     strategy:
       matrix:
         terramate-args: ["--changed", ""]
-        terraform-common-args: ["-no-color", ""]
-        terraform-init-args: ["-upgrade", ""]
-        terraform-validate-args: ["-json", ""]
-        terraform-plan-args: ["-parallelism=3", ""]
-        terraform-apply-args: ["-parallelism=2", ""]
-        terraform-destroy-args: ["-compact-warnings", ""]
+        comment-pull-request: ["true", "false"]
       fail-fast: true
     steps:
       - name: Checkout
@@ -74,19 +47,45 @@ jobs:
         uses: "./"
         with:
           terramate-args: ${{ matrix.terramate-args }}
-          terraform-common-args: ${{ matrix.terraform-common-args }}
-          terraform-init-args: ${{ matrix.terraform-init-args }}
-          terraform-validate-args: ${{ matrix.terraform-validate-args }}
-          terraform-plan-args: ${{ matrix.terraform-plan-args }}
-          terraform-apply-args: ${{ matrix.terraform-apply-args }}
-          terraform-destroy-args: ${{ matrix.terraform-destroy-args }}
-          apply: true
-          destroy: true
+          comment-pull-request: ${{ matrix.comment-pull-request }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  test-setup:
+    name: Test Setup
+    runs-on: ubuntu-latest
+    needs:
+      - test-simple
+    strategy:
+      matrix:
+        go-version: ["1.17", "latest"]
+        terramate-version: ["v0.4.2", "latest"]
+        terraform-version: ["1.5.7", "latest"]
+        terraform-plan-file: ["out.tfplan", "plan.out"]
+        tmp-file: ["tmp.txt", "file.tmp"]
+        cleanup: ["true", "false"]
+      fail-fast: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Test
+        uses: "./"
+        with:
+          go-version: ${{ matrix.go-version }}
+          terramate-version: ${{ matrix.terramate-version }}
+          terraform-version: ${{ matrix.terraform-version }}
+          terraform-plan-file: ${{ matrix.terraform-plan-file }}
+          temp-file: ${{ matrix.tmp-file }}
+          cleanup: ${{ matrix.cleanup }}
+          comment-pull-request: false
 
   test-jobs:
     name: Test Jobs
     runs-on: ubuntu-latest
+    needs:
+      - test-setup
     strategy:
       matrix:
         lint: ["true", "false"]
@@ -110,7 +109,7 @@ jobs:
           plan: ${{ matrix.plan }}
           apply: ${{ matrix.apply }}
           destroy: ${{ matrix.destroy }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-pull-request: false
       - name: Test With Init Only
         uses: "./"
         with:
@@ -122,6 +121,7 @@ jobs:
           apply: ${{ matrix.apply }}
           destroy: ${{ matrix.destroy }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-pull-request: false
       - name: Test Without Setup And Init
         uses: "./"
         with:
@@ -133,6 +133,44 @@ jobs:
           apply: ${{ matrix.apply }}
           destroy: ${{ matrix.destroy }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-pull-request: false
+
+  test-args:
+    name: Test Arguments
+    runs-on: ubuntu-latest
+    needs:
+      - test-jobs
+    strategy:
+      matrix:
+        terramate-args: ["--changed", ""]
+        terraform-common-args: ["-no-color", ""]
+        terraform-init-args: ["-upgrade", ""]
+        terraform-validate-args: ["-json", ""]
+        terraform-plan-args: ["-parallelism=3", ""]
+        terraform-show-args: ["-no-color", ""]
+        terraform-apply-args: ["-parallelism=2", ""]
+        terraform-destroy-args: ["-compact-warnings", ""]
+      fail-fast: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Test
+        uses: "./"
+        with:
+          terramate-args: ${{ matrix.terramate-args }}
+          terraform-common-args: ${{ matrix.terraform-common-args }}
+          terraform-init-args: ${{ matrix.terraform-init-args }}
+          terraform-validate-args: ${{ matrix.terraform-validate-args }}
+          terraform-plan-args: ${{ matrix.terraform-plan-args }}
+          terraform-show-args: ${{ matrix.terraform-plan-args }}
+          terraform-apply-args: ${{ matrix.terraform-apply-args }}
+          terraform-destroy-args: ${{ matrix.terraform-destroy-args }}
+          apply: true
+          destroy: true
+          comment-pull-request: false
 
   release:
     name: Release

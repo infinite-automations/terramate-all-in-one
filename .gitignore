@@ -1,6 +1,8 @@
 # ci
 out.tfplan
-pr-comment.txt
+plan.out
+tmp.txt
+file.tmp
 _terramate_generated_*
 .terraform.lock.hcl
 .tools-version

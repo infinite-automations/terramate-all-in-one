@@ -74,7 +74,7 @@ jobs:
           apply: true
 ```
 
->Note: If you use terramate with a [git config](https://terramate.io/docs/cli/configuration/#terramate-config-git-block-schema) tracking uncommited files add the `terraform-plan-file` and `temp-file` to yout `.gitignore` file to prevent ci errors. See the [default filenames](#inputs) if you do not specify different within your workflow.
+>Note: If you use terramate with a [git config](https://terramate.io/docs/cli/configuration/#terramate-config-git-block-schema) tracking uncommited files add the `terraform-plan-file` and `temp-file` to your `.gitignore` file to prevent errors. See the [default filenames](#inputs) if you do not specify different within your workflow.
 
 ## Inputs
 
