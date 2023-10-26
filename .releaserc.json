@@ -21,8 +21,8 @@
                         "files": [
                             "README.md"
                         ],
-                        "from": "m4s-b3n/terramate-all-in-one@v.*",
-                        "to": "m4s-b3n/terramate-all-in-one@v${nextRelease.version}",
+                        "from": "infinite-automations/terramate-all-in-one@v.*",
+                        "to": "infinite-automations/terramate-all-in-one@v${nextRelease.version}",
                         "results": [
                             {
                                 "file": "README.md",

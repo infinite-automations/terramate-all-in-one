@@ -8,4 +8,4 @@ updates:
       # Check for updates to GitHub Actions every week
       interval: "weekly"
     reviewers:
-      - m4s-b3n
+      - infinite-automations/admins

@@ -1,6 +1,6 @@
 # terramate-all-in-one
 
-[![Test & Release](https://github.com/m4s-b3n/terramate-all-in-one/actions/workflows/test-and-release.yml/badge.svg)](https://github.com/m4s-b3n/terramate-all-in-one/actions/workflows/test-and-release.yml)
+[![Test & Release](https://github.com/infinite-automations/terramate-all-in-one/actions/workflows/test-and-release.yml/badge.svg)](https://github.com/infinite-automations/terramate-all-in-one/actions/workflows/test-and-release.yml)
 
 Run common terramate commands in a single GitHub action
 
@@ -27,7 +27,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Terramate
-        uses: m4s-b3n/terramate-all-in-one@v1.0.3
+        uses: infinite-automations/terramate-all-in-one@v1.0.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           apply: ${{ github.event_name != 'pull_request' }}
@@ -57,7 +57,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Terramate
-        uses: m4s-b3n/terramate-all-in-one@v1.0.3
+        uses: infinite-automations/terramate-all-in-one@v1.0.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -69,7 +69,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Terramate
-        uses: m4s-b3n/terramate-all-in-one@v1.0.3
+        uses: infinite-automations/terramate-all-in-one@v1.0.3
         with:
           apply: true
 ```
