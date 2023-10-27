@@ -135,14 +135,13 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           comment-pull-request: false
 
-  test-args:
-    name: Test Arguments
+  test-terraform-args:
+    name: Test Terraform Arguments
     runs-on: ubuntu-latest
     needs:
       - test-jobs
     strategy:
       matrix:
-        terramate-args: ["--changed", ""]
         terraform-common-args: ["-no-color", ""]
         terraform-init-args: ["-upgrade", ""]
         terraform-validate-args: ["-json", ""]
@@ -160,7 +159,6 @@ jobs:
       - name: Test
         uses: "./"
         with:
-          terramate-args: ${{ matrix.terramate-args }}
           terraform-common-args: ${{ matrix.terraform-common-args }}
           terraform-init-args: ${{ matrix.terraform-init-args }}
           terraform-validate-args: ${{ matrix.terraform-validate-args }}
@@ -172,13 +170,40 @@ jobs:
           destroy: true
           comment-pull-request: false
 
+  test-terramate-args:
+    name: Test Terramate Arguments
+    runs-on: ubuntu-latest
+    needs:
+      - test-jobs
+    strategy:
+      matrix:
+        terramate-args: ["--changed", ""]
+        terramate-plan-args: ["--quiet", ""]
+        terramate-apply-args: ["--quiet", ""]
+        terramate-destroy-args: ["--reverse", ""]
+      fail-fast: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Test
+        uses: "./"
+        with:
+          terramate-args: ${{ matrix.terramate-args }}
+          terrmate-plan-args: ${{ matrix.terramate-plan-args }}
+          terramate-apply-args: ${{ matrix.terramate-apply-args }}
+          terramate-destroy-args: ${{ matrix.terramate-destroy-args }}
+          apply: true
+          destroy: true
+          comment-pull-request: false
+
   release:
     name: Release
     needs:
-      - test-simple
-      - test-setup
-      - test-args
-      - test-jobs
+      - test-terraform-args
+      - test-terramate-args
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

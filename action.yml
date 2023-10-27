@@ -19,6 +19,18 @@ inputs:
     description: "Arguments to pass to each Terramate command"
     required: false
     default: "--changed"
+  terramate-plan-args:
+    description: "Arguments to pass to Terramate in the plan step"
+    required: false
+    default: ""
+  terramate-apply-args:
+    description: "Arguments to pass to Terramate in the apply step"
+    required: false
+    default: ""
+  terramate-destroy-args:
+    description: "Arguments to pass to Terramate in the destroy step"
+    required: false
+    default: "--reverse"
   terraform-common-args:
     description: "Arguments to pass to each Terraform command"
     required: false
@@ -162,7 +174,9 @@ runs:
           ) && 
           steps.list.outputs.stdout != '' }}
       run: |
-        terramate run ${{ inputs.terramate-args }} \
+        terramate run \
+          ${{ inputs.terramate-args }} \
+          ${{ inputs.terramate-plan-args }} \
           -- terraform plan \
             ${{ inputs.terraform-common-args }} \
             ${{ inputs.terraform-plan-args }} \
@@ -219,7 +233,9 @@ runs:
         }}
       run: |
         if [ -f "${{ inputs.terraform-plan-file }}" ]; then
-          terramate run ${{ inputs.terramate-args }} \
+          terramate run \
+            ${{ inputs.terramate-args }} \            
+            ${{ inputs.terramate-apply-args }} \
             -- terraform apply \
               -auto-approve \
               -input=false \
@@ -227,7 +243,9 @@ runs:
               ${{ inputs.terraform-apply-args }} \
               ${{ inputs.terraform-plan-file }}
         else
-          terramate run ${{ inputs.terramate-args }} \
+          terramate run \
+            ${{ inputs.terramate-args }} \
+            ${{ inputs.terramate-apply-args }} \
             -- terraform apply \
               -auto-approve \
               -input=false \
@@ -238,7 +256,9 @@ runs:
     - name: Destroy
       if: ${{ inputs.destroy == 'true' && steps.list.outputs.stdout != '' }}
       run: |
-        terramate run ${{ inputs.terramate-args }} \
+        terramate run \
+          ${{ inputs.terramate-args }} \
+          ${{ inputs.terramate-destroy-args }} \
           -- terraform destroy \
             -auto-approve \
             -input=false \

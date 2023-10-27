@@ -78,32 +78,35 @@ jobs:
 
 ## Inputs
 
-| Input | Description | Required | Default |
-| --- | --- | --- | --- |
-| go-version | The version of Go to use | false | latest |
-| terramate-version | The version of Terramate to use (see [releases](https://github.com/terramate-io/terramate/releases)) | false | latest |
-| terraform-version | The version of Terraform to use (see [releases](https://github.com/hashicorp/terraform/releases)) | false | latest |
-| terramate-args | Arguments to pass to Terramate | false | --changed |
-| terraform-common-args | Arguments to pass to Terraform | false |  |
-| terraform-init-args | Arguments to pass to Terraform init | false |  |
-| terraform-validate-args | Arguments to pass to Terraform validate | false |  |
-| terraform-plan-args | Arguments to pass to Terraform plan | false |  |
-| terraform-show-args | Arguments to pass to Terraform show | false | -no-color |
-| terraform-apply-args | Arguments to pass to Terraform apply | false |  |
-| terraform-destroy-args | Arguments to pass to Terraform destroy | false |  |
-| terraform-plan-file | Path to Terraform plan file | false | out.tfplan |
-| temp-file | Path to preview comment file | false | tmp.txt |
-| setup | Setup Terramate and Terraform | false | true |
-| init | Initialize Terraform | false | true |
-| lint | Run linting | false | true |
-| generate | Generate code | false | true |
-| validate | Validate Terraform | false | true |
-| plan | Plan Terraform | false | true |
-| apply | Apply Terraform | false | false |
-| destroy | Destroy Terraform | false | false |
-| comment-pull-request | Comment on pull requests | false | true |
-| github-token | GitHub token required for commenting on pull requests | false | `` |
-| cleanup | Cleanup temporary files | false | true |
+| Input Variable          | Description                                           | Required | Default Value |
+| ----------------------- | ----------------------------------------------------- | -------- | ------------- |
+| go-version              | The version of Go to use                              | No       | latest        |
+| terramate-version       | The version of Terramate to use                       | No       | latest        |
+| terraform-version       | The version of Terraform to use                       | No       | latest        |
+| terramate-args          | Arguments to pass to each Terramate command           | No       | --changed     |
+| terramate-plan-args     | Arguments to pass to Terramate in the plan step       | No       |               |
+| terramate-apply-args    | Arguments to pass to Terramate in the apply step      | No       |               |
+| terramate-destroy-args  | Arguments to pass to Terramate in the destroy step    | No       | --reverse     |
+| terraform-common-args   | Arguments to pass to each Terraform command           | No       |               |
+| terraform-init-args     | Arguments to pass to terraform init                   | No       |               |
+| terraform-validate-args | Arguments to pass to terraform validate               | No       |               |
+| terraform-plan-args     | Arguments to pass to terraform plan                   | No       |               |
+| terraform-show-args     | Arguments to pass to terraform show                   | No       | -no-color     |
+| terraform-apply-args    | Arguments to pass to terraform apply                  | No       |               |
+| terraform-destroy-args  | Arguments to pass to terraform destroy                | No       |               |
+| terraform-plan-file     | Path to Terraform plan file                           | No       | out.tfplan    |
+| temp-file               | Path to preview comment file                          | No       | tmp.txt       |
+| setup                   | Setup Terramate and Terraform                         | No       | true          |
+| init                    | Initialize Terraform                                  | No       | true          |
+| lint                    | Run linting                                           | No       | true          |
+| generate                | Generate code                                         | No       | true          |
+| validate                | Validate Terraform                                    | No       | true          |
+| plan                    | Plan Terraform                                        | No       | true          |
+| apply                   | Apply Terraform                                       | No       | false         |
+| destroy                 | Destroy Terraform                                     | No       | false         |
+| comment-pull-request    | Comment on pull requests                              | No       | true          |
+| github-token            | GitHub token required for commenting on pull requests | No       |               |
+| cleanup                 | Cleanup temporary files                               | No       | true          |
 
 >Note: The `github-token` is not marked as required but it is required when the workflow was triggered by a pull request and commenting on pull requests is enabled.
 
