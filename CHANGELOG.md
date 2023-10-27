@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/infinite-automations/terramate-all-in-one/compare/v1.0.3...v1.1.0) (2023-10-27)
+
+
+### Features
+
+* **args:** add inputs for terramate arguments in the plan, apply and destroy steps ([83a4f75](https://github.com/infinite-automations/terramate-all-in-one/commit/83a4f75ad5a86e4329a596817a5b0c165c16e4aa))
+
 ## [1.0.3](https://github.com/infinite-automations/terramate-all-in-one/compare/v1.0.2...v1.0.3) (2023-10-25)
 
 ### Bug Fixes
