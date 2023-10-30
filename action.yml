@@ -127,7 +127,7 @@ runs:
       shell: bash
     - name: Setup Terraform
       if: ${{ inputs.setup == 'true' }}
-      uses: hashicorp/setup-terraform@v2
+      uses: hashicorp/setup-terraform@v3
       with:
         terraform_wrapper: false
         terraform_version: ${{ inputs.terraform-version }}
