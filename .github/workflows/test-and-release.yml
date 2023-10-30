@@ -219,3 +219,6 @@ jobs:
           ci: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: jessehouwing/actions-semver-checker@main
+        with:
+          check-minor-version: false
