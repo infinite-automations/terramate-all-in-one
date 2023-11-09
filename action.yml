@@ -170,7 +170,8 @@ runs:
       if: >-
         ${{ 
           ( inputs.plan == 'true' ||
-            inputs.comment-pull-request == 'true'
+            ( inputs.comment-pull-request == 'true' && 
+              github.event_name == 'pull_request' )
           ) && 
           steps.list.outputs.stdout != '' }}
       run: |
@@ -254,7 +255,11 @@ runs:
         fi
       shell: bash
     - name: Destroy
-      if: ${{ inputs.destroy == 'true' && steps.list.outputs.stdout != '' }}
+      if: >-
+        ${{ 
+          inputs.destroy == 'true' && 
+          steps.list.outputs.stdout != '' 
+        }}
       run: |
         terramate run \
           ${{ inputs.terramate-args }} \
