@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/infinite-automations/terramate-all-in-one/compare/v1.1.0...v1.1.1) (2023-11-09)
+
+
+### Bug Fixes
+
+* **plan:** fix condition for executing plan step([#8](https://github.com/infinite-automations/terramate-all-in-one/issues/8)) ([a65eaae](https://github.com/infinite-automations/terramate-all-in-one/commit/a65eaae13449480adda14a671544cdddab578c29))
+
 # [1.1.0](https://github.com/infinite-automations/terramate-all-in-one/compare/v1.0.3...v1.1.0) (2023-10-27)
 
 

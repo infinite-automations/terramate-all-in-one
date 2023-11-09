@@ -27,7 +27,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Terramate
-        uses: infinite-automations/terramate-all-in-one@v1.1.0
+        uses: infinite-automations/terramate-all-in-one@v1.1.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           apply: ${{ github.event_name != 'pull_request' }}
@@ -57,7 +57,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Terramate
-        uses: infinite-automations/terramate-all-in-one@v1.1.0
+        uses: infinite-automations/terramate-all-in-one@v1.1.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -69,7 +69,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Terramate
-        uses: infinite-automations/terramate-all-in-one@v1.1.0
+        uses: infinite-automations/terramate-all-in-one@v1.1.1
         with:
           apply: true
 ```
