@@ -117,7 +117,7 @@ runs:
   steps:
     - name: Setup Go
       if: ${{ inputs.setup == 'true' }}
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         cache: false
     - name: Setup Terramate
