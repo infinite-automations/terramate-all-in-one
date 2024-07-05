@@ -57,8 +57,7 @@ jobs:
       - test-simple
     strategy:
       matrix:
-        go-version: ["1.17", "latest"]
-        terramate-version: ["v0.4.2", "latest"]
+        terramate-version: ["0.4.2", "latest"]
         terraform-version: ["1.5.7", "latest"]
         terraform-plan-file: ["out.tfplan", "plan.out"]
         tmp-file: ["tmp.txt", "file.tmp"]
@@ -73,7 +72,6 @@ jobs:
       - name: Test
         uses: "./"
         with:
-          go-version: ${{ matrix.go-version }}
           terramate-version: ${{ matrix.terramate-version }}
           terraform-version: ${{ matrix.terraform-version }}
           terraform-plan-file: ${{ matrix.terraform-plan-file }}
