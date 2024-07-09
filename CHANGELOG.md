@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/infinite-automations/terramate-all-in-one/compare/v1.1.1...v1.2.0) (2024-07-09)
+
+
+### Features
+
+* **setup:** switch to official terramate-setup-action ([#11](https://github.com/infinite-automations/terramate-all-in-one/issues/11)) ([a7dcfd2](https://github.com/infinite-automations/terramate-all-in-one/commit/a7dcfd23d06b33d7189a7db468d896238fd761b3))
+
 ## [1.1.1](https://github.com/infinite-automations/terramate-all-in-one/compare/v1.1.0...v1.1.1) (2023-11-09)
 
 
