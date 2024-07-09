@@ -3,10 +3,6 @@ name: "Terramate All-In-One"
 description: "Run common terramate commands in a single GitHub action"
 
 inputs:
-  go-version:
-    description: "The version of Go to use"
-    required: false
-    default: "latest"
   terramate-version:
     description: "The version of Terramate to use"
     required: false
@@ -115,16 +111,12 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Setup Go
-      if: ${{ inputs.setup == 'true' }}
-      uses: actions/setup-go@v5
-      with:
-        cache: false
     - name: Setup Terramate
+      uses: terramate-io/terramate-action@v2
       if: ${{ inputs.setup == 'true' }}
-      run: |
-        go install github.com/terramate-io/terramate/cmd/...@${{ inputs.terramate-version }}
-      shell: bash
+      with:
+        version: ${{ inputs.terramate-version }}
+        use_wrapper: false
     - name: Setup Terraform
       if: ${{ inputs.setup == 'true' }}
       uses: hashicorp/setup-terraform@v3
@@ -168,11 +160,11 @@ runs:
       shell: bash
     - name: Plan
       if: >-
-        ${{ 
+        ${{
           ( inputs.plan == 'true' ||
-            ( inputs.comment-pull-request == 'true' && 
+            ( inputs.comment-pull-request == 'true' &&
               github.event_name == 'pull_request' )
-          ) && 
+          ) &&
           steps.list.outputs.stdout != '' }}
       run: |
         terramate run \
@@ -185,8 +177,8 @@ runs:
       shell: bash
     - name: Generate Preview Comment
       if: >-
-        ${{ 
-          inputs.comment-pull-request == 'true' && 
+        ${{
+          inputs.comment-pull-request == 'true' &&
           github.event_name == 'pull_request'
         }}
       run: |
@@ -217,8 +209,8 @@ runs:
       shell: bash
     - name: Publish Plans
       if: >-
-        ${{ 
-          inputs.comment-pull-request == 'true' && 
+        ${{
+          inputs.comment-pull-request == 'true' &&
           github.event_name == 'pull_request'
         }}
       uses: marocchino/sticky-pull-request-comment@v2
@@ -228,14 +220,14 @@ runs:
         path: ${{ inputs.temp-file }}
     - name: Apply
       if: >-
-        ${{ 
-          inputs.apply == 'true' && 
+        ${{
+          inputs.apply == 'true' &&
           steps.list.outputs.stdout != ''
         }}
       run: |
         if [ -f "${{ inputs.terraform-plan-file }}" ]; then
           terramate run \
-            ${{ inputs.terramate-args }} \            
+            ${{ inputs.terramate-args }} \
             ${{ inputs.terramate-apply-args }} \
             -- terraform apply \
               -auto-approve \
@@ -256,9 +248,9 @@ runs:
       shell: bash
     - name: Destroy
       if: >-
-        ${{ 
-          inputs.destroy == 'true' && 
-          steps.list.outputs.stdout != '' 
+        ${{
+          inputs.destroy == 'true' &&
+          steps.list.outputs.stdout != ''
         }}
       run: |
         terramate run \
