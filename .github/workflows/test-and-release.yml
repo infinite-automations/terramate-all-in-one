@@ -176,7 +176,7 @@ jobs:
     name: Test Terramate Arguments
     runs-on: ubuntu-latest
     needs:
-      - test-jobs
+      - test-terraform-args
     strategy:
       matrix:
         terramate-args: ["--changed", ""]
