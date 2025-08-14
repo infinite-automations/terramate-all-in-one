@@ -37,6 +37,7 @@ jobs:
         terramate-args: ["--changed", ""]
         comment-pull-request: ["true", "false"]
       fail-fast: true
+      max-parallel: 3
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -63,6 +64,7 @@ jobs:
         tmp-file: ["tmp.txt", "file.tmp"]
         cleanup: ["true", "false"]
       fail-fast: true
+      max-parallel: 3
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -93,6 +95,7 @@ jobs:
         apply: ["true", "false"]
         destroy: ["true", "false"]
       fail-fast: true
+      max-parallel: 3
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -148,6 +151,7 @@ jobs:
         terraform-apply-args: ["-parallelism=2", ""]
         terraform-destroy-args: ["-compact-warnings", ""]
       fail-fast: true
+      max-parallel: 3
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -180,6 +184,7 @@ jobs:
         terramate-apply-args: ["--quiet", ""]
         terramate-destroy-args: ["--reverse", ""]
       fail-fast: true
+      max-parallel: 3
     steps:
       - name: Checkout
         uses: actions/checkout@v5
