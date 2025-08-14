@@ -1,6 +1,6 @@
 # terramate-all-in-one
 
-[![Test & Release](https://github.com/infinite-automations/terramate-all-in-one/actions/workflows/test-and-release.yml/badge.svg)](https://github.com/infinite-automations/terramate-all-in-one/actions/workflows/test-and-release.yml)
+[![Test & Release](https://github.com/infinite-automations/terramate-all-in-one/actions/workflows/test-and-release.yml/badge.svg?branch=main)](https://github.com/infinite-automations/terramate-all-in-one/actions/workflows/test-and-release.yml)
 
 Run common terramate commands in a single GitHub action
 
