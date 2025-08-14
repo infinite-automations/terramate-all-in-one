@@ -4,9 +4,46 @@
     ],
     "tagFormat": "v${version}",
     "plugins": [
-        "@semantic-release/commit-analyzer",
+        [
+            "@semantic-release/commit-analyzer",
+            {
+                "preset": "conventionalcommits",
+                "releaseRules": [
+                    {
+                        "type": "chore",
+                        "scope": "deps",
+                        "release": "patch"
+                    }
+                ]
+            }
+        ],
         "semantic-release-major-tag",
-        "@semantic-release/release-notes-generator",
+        [
+            "@semantic-release/release-notes-generator",
+            {
+                "preset": "conventionalcommits",
+                "presetConfig": {
+                    "types": [
+                        {
+                            "type": "feat",
+                            "section": "Features",
+                            "hidden": false
+                        },
+                        {
+                            "type": "fix",
+                            "section": "Bug Fixes",
+                            "hidden": false
+                        },
+                        {
+                            "type": "chore",
+                            "scope": "deps",
+                            "section": "Dependencies",
+                            "hidden": false
+                        }
+                    ]
+                }
+            }
+        ],
         [
             "@semantic-release/changelog",
             {
