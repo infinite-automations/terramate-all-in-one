@@ -216,7 +216,7 @@ jobs:
           npm install semantic-release-replace-plugin -D
           npm install --save-dev semantic-release-major-tag
       - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v4
+        uses: cycjimmy/semantic-release-action@v5
         with:
           dry_run: ${{ github.event_name == 'pull_request' }}
           ci: true
