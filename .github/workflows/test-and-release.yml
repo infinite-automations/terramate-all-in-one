@@ -6,15 +6,16 @@ on:
   pull_request:
     branches: ["main"]
 
-permissions:
-  id-token: write
-  contents: write
-  pull-requests: write
+permissions: {}
 
 jobs:
   test-simple:
     name: Test Simple
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -29,6 +30,10 @@ jobs:
   test-pull-request:
     name: Test Pull Request
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
     needs:
       - test-simple
     if: ${{ github.event_name == 'pull_request' }}
@@ -56,6 +61,10 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - test-simple
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
     strategy:
       matrix:
         terramate-version: ["0.4.2", "latest"]
@@ -86,6 +95,10 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - test-setup
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
     strategy:
       matrix:
         lint: ["true", "false"]
@@ -141,6 +154,10 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - test-jobs
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
     strategy:
       matrix:
         terraform-common-args: ["-no-color", ""]
@@ -177,6 +194,10 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - test-terraform-args
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
     strategy:
       matrix:
         terramate-args: ["--changed", ""]
@@ -208,17 +229,28 @@ jobs:
       - test-terraform-args
       - test-terramate-args
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-      - name: Install Semantic Release Plugins
-        run: |
-          npm install semantic-release-replace-plugin -D
-          npm install --save-dev semantic-release-major-tag
-      - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v4
+      - name: Checkout Code
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
-          dry_run: ${{ github.event_name == 'pull_request' }}
-          ci: true
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Get GitHub App Token
+        id: get_token
+        uses: actions/create-github-app-token@67018539274d69449ef7c02e8e71183d1719ab42 # v2.1.4
+        with:
+          app-id: ${{ secrets.APP_ID_SEMREL }}
+          private-key: ${{ secrets.APP_KEY_SEMREL }}
+
+      - name: Create Release
+        uses: cycjimmy/semantic-release-action@9cc899c47e6841430bbaedb43de1560a568dfd16 # v5.0.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.get_token.outputs.token }}
+        with:
+          dry-run: ${{ github.event_name != 'push' }}
+          extra_plugins: |
+            semantic-release-major-tag
+            semantic-release-replace-plugin
