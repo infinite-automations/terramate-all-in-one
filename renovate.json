@@ -1,0 +1,7 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "github>infinite-automations/renovate-configs:automerge-minor#v1.0.0",
+    "github>infinite-automations/renovate-configs:module#v1.0.0"
+  ]
+}
