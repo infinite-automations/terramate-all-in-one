@@ -112,7 +112,7 @@ runs:
   using: "composite"
   steps:
     - name: Setup Terramate
-      uses: terramate-io/terramate-action@c5a1375801a3fac44d29fc7e0ebb3757ea0db3e0 # v3
+      uses: terramate-io/terramate-action@1cc78a548efefaab7762f4d06f51aa6de06ce201 # v3
       if: ${{ inputs.setup == 'true' }}
       with:
         version: ${{ inputs.terramate-version }}
