@@ -1,0 +1,64 @@
+---
+name: "Test & Release"
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  # for security reasons we lint before any other code gets executed
+  lint:
+    name: Lint
+    uses: infinite-automations/workflows/.github/workflows/lint.yml@7cad5f58cd6cf4a95377b0eeab1b0ab581272ed9 # v1.0.1
+    permissions:
+      contents: read
+      packages: read
+      statuses: write
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-lint
+      cancel-in-progress: true
+
+  test:
+    name: Test
+    needs:
+      - lint
+    uses: ./.github/workflows/test.yml
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-test
+      cancel-in-progress: true
+
+  release:
+    name: Release
+    needs:
+      - test
+    permissions:
+      contents: write
+      issues: write
+      packages: read
+      pull-requests: write
+      statuses: write
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-release
+      cancel-in-progress: false
+    uses: infinite-automations/workflows/.github/workflows/ci-terraform-module.yml@7cad5f58cd6cf4a95377b0eeab1b0ab581272ed9 # v1.0.1
+    with:
+      dry-run: ${{ github.event_name == 'pull_request' }}
+      skip-lint: true
+      semrel-extra-plugins: |
+        semantic-release-major-tag
+        semantic-release-replace-plugin
+    secrets:
+      APP_ID: ${{ secrets.APP_ID_SEMREL }}
+      APP_PRIVATE_KEY: ${{ secrets.APP_KEY_SEMREL }}

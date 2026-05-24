@@ -1,0 +1,34 @@
+{
+  "features": {
+    "ghcr.io/devcontainers-contrib/features/terramate:1": {
+      "version": "1.0.6",
+      "resolved": "ghcr.io/devcontainers-extra/features/terramate@sha256:708480a11337f86dcaf3623bce86a6b9fd77fb820733d37bd5979ba05da11710",
+      "integrity": "sha256:708480a11337f86dcaf3623bce86a6b9fd77fb820733d37bd5979ba05da11710"
+    },
+    "ghcr.io/devcontainers-extra/features/terraform-docs:1": {
+      "version": "1.0.6",
+      "resolved": "ghcr.io/devcontainers-extra/features/terraform-docs@sha256:06dd6e80f0608d3715d40b60d409c4bbcbcd08c8ac1b6b0cc36860e07c08972c",
+      "integrity": "sha256:06dd6e80f0608d3715d40b60d409c4bbcbcd08c8ac1b6b0cc36860e07c08972c"
+    },
+    "ghcr.io/devcontainers/features/azure-cli:1": {
+      "version": "1.2.9",
+      "resolved": "ghcr.io/devcontainers/features/azure-cli@sha256:4549175fbfd3475d1d62e82f6e5425d03954a6ae06027b2515b0ba41a8206417",
+      "integrity": "sha256:4549175fbfd3475d1d62e82f6e5425d03954a6ae06027b2515b0ba41a8206417"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:3": {
+      "version": "3.0.1",
+      "resolved": "ghcr.io/devcontainers/features/docker-in-docker@sha256:ca2508495b01ba29eba93e8153772a2daa65eaa86471cc6863fe2a3d21933df9",
+      "integrity": "sha256:ca2508495b01ba29eba93e8153772a2daa65eaa86471cc6863fe2a3d21933df9"
+    },
+    "ghcr.io/devcontainers/features/node:2": {
+      "version": "2.0.0",
+      "resolved": "ghcr.io/devcontainers/features/node@sha256:fedd4c11f7adfb64283b578dddc7da906728daa25fa293351c9d913231acf12f",
+      "integrity": "sha256:fedd4c11f7adfb64283b578dddc7da906728daa25fa293351c9d913231acf12f"
+    },
+    "ghcr.io/devcontainers/features/terraform:1": {
+      "version": "1.4.3",
+      "resolved": "ghcr.io/devcontainers/features/terraform@sha256:503d0888b3a43a32335e08cd4477f8c4629404ad83f6a36f0e0fee7f567c06c7",
+      "integrity": "sha256:503d0888b3a43a32335e08cd4477f8c4629404ad83f6a36f0e0fee7f567c06c7"
+    }
+  }
+}
