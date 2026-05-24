@@ -248,7 +248,7 @@ runs:
           inputs.comment-pull-request == 'true' &&
           github.event_name == 'pull_request'
         }}
-      uses: marocchino/sticky-pull-request-comment@d4d6b0936434c940209842a4a0592b1867e6eeb5 # v3.0.2
+      uses: marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0 # v3.0.4
       with:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         header: terraform-plan
