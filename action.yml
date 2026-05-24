@@ -1,3 +1,4 @@
+---
 name: "Terramate All-In-One"
 
 description: "Run common terramate commands in a single GitHub action"
@@ -112,52 +113,71 @@ runs:
   using: "composite"
   steps:
     - name: Setup Terramate
-      uses: terramate-io/terramate-action@1cc78a548efefaab7762f4d06f51aa6de06ce201 # v3
+      uses: terramate-io/terramate-action@1cc78a548efefaab7762f4d06f51aa6de06ce201 # v3.3.0
       if: ${{ inputs.setup == 'true' }}
       with:
         version: ${{ inputs.terramate-version }}
         use_wrapper: false
+
     - name: Setup Terraform
       if: ${{ inputs.setup == 'true' }}
-      uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4
+      uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
       with:
         terraform_wrapper: false
         terraform_version: ${{ inputs.terraform-version }}
+
     - name: Lint
       if: ${{ inputs.lint == 'true' }}
       run: |
         terramate fmt --check
       shell: bash
+
     - name: List Affected Stacks
       id: list
       run: |
         echo "stdout<<STDOUT" >>$GITHUB_OUTPUT
-        terramate list ${{ inputs.terramate-args }} >>$GITHUB_OUTPUT
+        terramate list ${INPUTS_TERRAMATE_ARGS} >>$GITHUB_OUTPUT
         EXIT_CODE=$?
         echo "STDOUT" >>$GITHUB_OUTPUT
         exit ${EXIT_CODE}
       shell: bash
+      env:
+        INPUTS_TERRAMATE_ARGS: ${{ inputs.terramate-args }}
+
     - name: Generate Code
       if: ${{ inputs.generate == 'true' && steps.list.outputs.stdout != '' }}
       run: |
-        terramate generate ${{ inputs.terramate-args }}
+        terramate generate ${INPUTS_TERRAMATE_ARGS}
       shell: bash
+      env:
+        INPUTS_TERRAMATE_ARGS: ${{ inputs.terramate-args }}
+
     - name: Initialize
       if: ${{ inputs.init == 'true' && steps.list.outputs.stdout != '' }}
       run: |
-        terramate run ${{ inputs.terramate-args }} \
+        terramate run ${INPUTS_TERRAMATE_ARGS} \
           -- terraform init \
-            ${{ inputs.terraform-common-args }} \
-            ${{ inputs.terraform-init-args }}
+            ${INPUTS_TERRAFORM_COMMON_ARGS} \
+            ${INPUTS_TERRAFORM_INIT_ARGS}
       shell: bash
+      env:
+        INPUTS_TERRAMATE_ARGS: ${{ inputs.terramate-args }}
+        INPUTS_TERRAFORM_COMMON_ARGS: ${{ inputs.terraform-common-args }}
+        INPUTS_TERRAFORM_INIT_ARGS: ${{ inputs.terraform-init-args }}
+
     - name: Validate
       if: ${{ inputs.validate == 'true' && steps.list.outputs.stdout != '' }}
       run: |
-        terramate run ${{ inputs.terramate-args }} \
+        terramate run ${INPUTS_TERRAMATE_ARGS} \
           -- terraform validate \
-            ${{ inputs.terraform-common-args }} \
-            ${{ inputs.terraform-validate-args }}
+            ${INPUTS_TERRAFORM_COMMON_ARGS} \
+            ${INPUTS_TERRAFORM_VALIDATE_ARGS}
       shell: bash
+      env:
+        INPUTS_TERRAMATE_ARGS: ${{ inputs.terramate-args }}
+        INPUTS_TERRAFORM_COMMON_ARGS: ${{ inputs.terraform-common-args }}
+        INPUTS_TERRAFORM_VALIDATE_ARGS: ${{ inputs.terraform-validate-args }}
+
     - name: Plan
       if: >-
         ${{
@@ -168,13 +188,20 @@ runs:
           steps.list.outputs.stdout != '' }}
       run: |
         terramate run \
-          ${{ inputs.terramate-args }} \
-          ${{ inputs.terramate-plan-args }} \
+          ${INPUTS_TERRAMATE_ARGS} \
+          ${INPUTS_TERRAMATE_PLAN_ARGS} \
           -- terraform plan \
-            ${{ inputs.terraform-common-args }} \
-            ${{ inputs.terraform-plan-args }} \
-            -out ${{ inputs.terraform-plan-file }}
+            ${INPUTS_TERRAFORM_COMMON_ARGS} \
+            ${INPUTS_TERRAFORM_PLAN_ARGS} \
+            -out ${INPUTS_TERRAFORM_PLAN_FILE}
       shell: bash
+      env:
+        INPUTS_TERRAMATE_ARGS: ${{ inputs.terramate-args }}
+        INPUTS_TERRAMATE_PLAN_ARGS: ${{ inputs.terramate-plan-args }}
+        INPUTS_TERRAFORM_COMMON_ARGS: ${{ inputs.terraform-common-args }}
+        INPUTS_TERRAFORM_PLAN_ARGS: ${{ inputs.terraform-plan-args }}
+        INPUTS_TERRAFORM_PLAN_FILE: ${{ inputs.terraform-plan-file }}
+
     - name: Generate Preview Comment
       if: >-
         ${{
@@ -183,41 +210,50 @@ runs:
         }}
       run: |
         set +x
-        if [[ -z '${{ steps.list.outputs.stdout }}' ]]; then
-          echo >>${{ inputs.temp-file }} '### No changed stacks.'
-          cat ${{ inputs.temp-file }} >>$GITHUB_STEP_SUMMARY
+        if [[ -z '${STEPS_LIST_OUTPUTS_STDOUT}' ]]; then
+          echo >>${INPUTS_TEMP_FILE} '### No changed stacks.'
+          cat ${INPUTS_TEMP_FILE} >>$GITHUB_STEP_SUMMARY
         else
-          echo >>${{ inputs.temp-file }} "### List of Changed Stacks"
-          echo >>${{ inputs.temp-file }}
-          echo >>${{ inputs.temp-file }} '```bash'
-          echo >>${{ inputs.temp-file }} "${{ steps.list.outputs.stdout }}"
-          echo >>${{ inputs.temp-file }} '```'
-          echo >>${{ inputs.temp-file }}
-          echo >>${{ inputs.temp-file }} "#### Terraform Plan"
-          echo >>${{ inputs.temp-file }}
-          echo >>${{ inputs.temp-file }} '```terraform'
-          terramate run ${{ inputs.terramate-args }} \
+          echo >>${INPUTS_TEMP_FILE} "### List of Changed Stacks"
+          echo >>${INPUTS_TEMP_FILE}
+          echo >>${INPUTS_TEMP_FILE} '```bash'
+          echo >>${INPUTS_TEMP_FILE} "${STEPS_LIST_OUTPUTS_STDOUT}"
+          echo >>${INPUTS_TEMP_FILE} '```'
+          echo >>${INPUTS_TEMP_FILE}
+          echo >>${INPUTS_TEMP_FILE} "#### Terraform Plan"
+          echo >>${INPUTS_TEMP_FILE}
+          echo >>${INPUTS_TEMP_FILE} '```terraform'
+          terramate run ${INPUTS_TERRAMATE_ARGS} \
             -- terraform show \
-            ${{ inputs.terraform-common-args }} \
-            ${{ inputs.terraform-show-args }} \
-            ${{ inputs.terraform-plan-file }} \
+            ${INPUTS_TERRAFORM_COMMON_ARGS} \
+            ${INPUTS_TERRAFORM_SHOW_ARGS} \
+            ${INPUTS_TERRAFORM_PLAN_FILE} \
             2>&1 \
-            >>${{ inputs.temp-file }}
-          echo >>${{ inputs.temp-file }} '```'
-          cat ${{ inputs.temp-file }} >>$GITHUB_STEP_SUMMARY
+            >>${INPUTS_TEMP_FILE}
+          echo >>${INPUTS_TEMP_FILE} '```'
+          cat ${INPUTS_TEMP_FILE} >>$GITHUB_STEP_SUMMARY
         fi
       shell: bash
+      env:
+        STEPS_LIST_OUTPUTS_STDOUT: ${{ steps.list.outputs.stdout }}
+        INPUTS_TEMP_FILE: ${{ inputs.temp-file }}
+        INPUTS_TERRAMATE_ARGS: ${{ inputs.terramate-args }}
+        INPUTS_TERRAFORM_COMMON_ARGS: ${{ inputs.terraform-common-args }}
+        INPUTS_TERRAFORM_SHOW_ARGS: ${{ inputs.terraform-show-args }}
+        INPUTS_TERRAFORM_PLAN_FILE: ${{ inputs.terraform-plan-file }}
+
     - name: Publish Plans
       if: >-
         ${{
           inputs.comment-pull-request == 'true' &&
           github.event_name == 'pull_request'
         }}
-      uses: marocchino/sticky-pull-request-comment@70d2764d1a7d5d9560b100cbea0077fc8f633987 # v3
+      uses: marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0 # v3.0.4
       with:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         header: terraform-plan
         path: ${{ inputs.temp-file }}
+
     - name: Apply
       if: >-
         ${{
@@ -225,27 +261,34 @@ runs:
           steps.list.outputs.stdout != ''
         }}
       run: |
-        if [ -f "${{ inputs.terraform-plan-file }}" ]; then
+        if [ -f "${INPUTS_TERRAFORM_PLAN_FILE}" ]; then
           terramate run \
-            ${{ inputs.terramate-args }} \
-            ${{ inputs.terramate-apply-args }} \
+            ${INPUTS_TERRAMATE_ARGS} \
+            ${INPUTS_TERRAMATE_APPLY_ARGS} \
             -- terraform apply \
               -auto-approve \
               -input=false \
-              ${{ inputs.terraform-common-args }} \
-              ${{ inputs.terraform-apply-args }} \
-              ${{ inputs.terraform-plan-file }}
+              ${INPUTS_TERRAFORM_COMMON_ARGS} \
+              ${INPUTS_TERRAFORM_APPLY_ARGS} \
+              ${INPUTS_TERRAFORM_PLAN_FILE}
         else
           terramate run \
-            ${{ inputs.terramate-args }} \
-            ${{ inputs.terramate-apply-args }} \
+            ${INPUTS_TERRAMATE_ARGS} \
+            ${INPUTS_TERRAMATE_APPLY_ARGS} \
             -- terraform apply \
               -auto-approve \
               -input=false \
-              ${{ inputs.terraform-common-args }} \
-              ${{ inputs.terraform-apply-args }}
+              ${INPUTS_TERRAFORM_COMMON_ARGS} \
+              ${INPUTS_TERRAFORM_APPLY_ARGS}
         fi
       shell: bash
+      env:
+        INPUTS_TERRAFORM_PLAN_FILE: ${{ inputs.terraform-plan-file }}
+        INPUTS_TERRAMATE_ARGS: ${{ inputs.terramate-args }}
+        INPUTS_TERRAMATE_APPLY_ARGS: ${{ inputs.terramate-apply-args }}
+        INPUTS_TERRAFORM_COMMON_ARGS: ${{ inputs.terraform-common-args }}
+        INPUTS_TERRAFORM_APPLY_ARGS: ${{ inputs.terraform-apply-args }}
+
     - name: Destroy
       if: >-
         ${{
@@ -254,17 +297,25 @@ runs:
         }}
       run: |
         terramate run \
-          ${{ inputs.terramate-args }} \
-          ${{ inputs.terramate-destroy-args }} \
+          ${INPUTS_TERRAMATE_ARGS} \
+          ${INPUTS_TERRAMATE_DESTROY_ARGS} \
           -- terraform destroy \
             -auto-approve \
             -input=false \
-            ${{ inputs.terraform-common-args }} \
-            ${{ inputs.terraform-destroy-args }}
+            ${INPUTS_TERRAFORM_COMMON_ARGS} \
+            ${INPUTS_TERRAFORM_DESTROY_ARGS}
       shell: bash
+      env:
+        INPUTS_TERRAMATE_ARGS: ${{ inputs.terramate-args }}
+        INPUTS_TERRAMATE_DESTROY_ARGS: ${{ inputs.terramate-destroy-args }}
+        INPUTS_TERRAFORM_COMMON_ARGS: ${{ inputs.terraform-common-args }}
+        INPUTS_TERRAFORM_DESTROY_ARGS: ${{ inputs.terraform-destroy-args }}
+
     - name: Cleanup
       if: ${{ inputs.cleanup == 'true' }}
       run: |
         find . -name out.tfplan -exec rm -rf {} \;
-        rm -f ${{ inputs.temp-file }}
+        rm -f ${INPUTS_TEMP_FILE}
       shell: bash
+      env:
+        INPUTS_TEMP_FILE: ${{ inputs.temp-file }}
