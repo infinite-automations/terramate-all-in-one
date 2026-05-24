@@ -1,17 +1,12 @@
-name: "Test & Release"
+---
+name: Test
 
 on:
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
 
 permissions: {}
 
+# jscpd:ignore-start
 jobs:
   test-simple:
     name: Test Simple
@@ -22,10 +17,12 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          persist-credentials: false
           ref: ${{ github.head_ref }}
           fetch-depth: 0
+
       - name: Test
         uses: "./"
         with:
@@ -49,10 +46,12 @@ jobs:
       max-parallel: 3
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          persist-credentials: false
           ref: ${{ github.head_ref }}
           fetch-depth: 0
+
       - name: Test
         uses: "./"
         with:
@@ -80,10 +79,12 @@ jobs:
       max-parallel: 3
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          persist-credentials: false
           ref: ${{ github.head_ref }}
           fetch-depth: 0
+
       - name: Test
         uses: "./"
         with:
@@ -115,10 +116,12 @@ jobs:
       max-parallel: 3
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          persist-credentials: false
           ref: ${{ github.head_ref }}
           fetch-depth: 0
+
       - name: Test With Setup And Init
         uses: "./"
         with:
@@ -128,6 +131,7 @@ jobs:
           apply: ${{ matrix.apply }}
           destroy: ${{ matrix.destroy }}
           comment-pull-request: false
+
       - name: Test With Init Only
         uses: "./"
         with:
@@ -140,6 +144,7 @@ jobs:
           destroy: ${{ matrix.destroy }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           comment-pull-request: false
+
       - name: Test Without Setup And Init
         uses: "./"
         with:
@@ -175,10 +180,12 @@ jobs:
       max-parallel: 3
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          persist-credentials: false
           ref: ${{ github.head_ref }}
           fetch-depth: 0
+
       - name: Test
         uses: "./"
         with:
@@ -212,49 +219,20 @@ jobs:
       max-parallel: 3
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          persist-credentials: false
           ref: ${{ github.head_ref }}
           fetch-depth: 0
+
       - name: Test
         uses: "./"
         with:
           terramate-args: ${{ matrix.terramate-args }}
-          terrmate-plan-args: ${{ matrix.terramate-plan-args }}
+          terramate-plan-args: ${{ matrix.terramate-plan-args }}
           terramate-apply-args: ${{ matrix.terramate-apply-args }}
           terramate-destroy-args: ${{ matrix.terramate-destroy-args }}
           apply: true
           destroy: true
           comment-pull-request: false
-
-  release:
-    name: Release
-    needs:
-      - test-terraform-args
-      - test-terramate-args
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Get GitHub App Token
-        id: get_token
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
-        with:
-          app-id: ${{ secrets.APP_ID_SEMREL }}
-          private-key: ${{ secrets.APP_KEY_SEMREL }}
-
-      - name: Create Release
-        uses: cycjimmy/semantic-release-action@b12c8f6015dc215fe37bc154d4ad456dd3833c90 # v6.0.0
-        env:
-          GITHUB_TOKEN: ${{ steps.get_token.outputs.token }}
-        with:
-          dry-run: ${{ github.event_name != 'push' }}
-          extra_plugins: |
-            semantic-release-major-tag
-            semantic-release-replace-plugin
+# jscpd:ignore-end
