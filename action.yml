@@ -210,7 +210,7 @@ runs:
         }}
       run: |
         set +x
-        if [[ -z '${STEPS_LIST_OUTPUTS_STDOUT}' ]]; then
+        if [[ -z "${STEPS_LIST_OUTPUTS_STDOUT}" ]]; then
           echo >>${INPUTS_TEMP_FILE} '### No changed stacks.'
           cat ${INPUTS_TEMP_FILE} >>$GITHUB_STEP_SUMMARY
         else
