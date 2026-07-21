@@ -27,7 +27,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Terramate
-        uses: infinite-automations/terramate-all-in-one@v1.2.0
+        uses: infinite-automations/terramate-all-in-one@v1.2.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           apply: ${{ github.event_name != 'pull_request' }}
@@ -57,7 +57,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Terramate
-        uses: infinite-automations/terramate-all-in-one@v1.2.0
+        uses: infinite-automations/terramate-all-in-one@v1.2.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -69,7 +69,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Terramate
-        uses: infinite-automations/terramate-all-in-one@v1.2.0
+        uses: infinite-automations/terramate-all-in-one@v1.2.1
         with:
           apply: true
 ```
@@ -112,3 +112,29 @@ jobs:
 ## Changelog
 
 See the [Changelog](./CHANGELOG.md) file for details
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+No requirements.
+
+## Providers
+
+No providers.
+
+## Modules
+
+No modules.
+
+## Resources
+
+No resources.
+
+## Inputs
+
+No inputs.
+
+## Outputs
+
+No outputs.
+<!-- END_TF_DOCS -->

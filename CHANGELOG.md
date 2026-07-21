@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/infinite-automations/terramate-all-in-one/compare/v1.2.0...v1.2.1) (2026-07-21)
+
+
+### Bug Fixes
+
+* **deps:** update marocchino/sticky-pull-request-comment action to v3.0.5 ([#49](https://github.com/infinite-automations/terramate-all-in-one/issues/49)) ([e6845e4](https://github.com/infinite-automations/terramate-all-in-one/commit/e6845e4649b201757f86863ab6f4ddaf6ac4332c))
+
 # [1.2.0](https://github.com/infinite-automations/terramate-all-in-one/compare/v1.1.1...v1.2.0) (2024-07-09)
 
 
